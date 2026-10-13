@@ -165,7 +165,6 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
         @NonNull int[] grantResults) {
 
         if (requestCode != PermissionConstants.PERMISSION_CODE) {
-            pendingRequestCount = 0;
             return false;
         }
 
@@ -174,9 +173,8 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
         }
 
         if (permissions.length == 0 && grantResults.length == 0) {
-            pendingRequestCount = 0;
-            Log.w(PermissionConstants.LOG_TAG, "onRequestPermissionsResult is called without results. This is probably caused by interfering request codes. If you see this error, please file an issue in flutter-permission-handler, including a list of plugins used by this application: https://github.com/Baseflow/flutter-permission-handler/issues");
-            return false;
+            cancelPendingRequest();
+            return true;
         }
 
         // Calendar permissions are split between WRITE and READ in Android, and split between WRITE
@@ -281,6 +279,22 @@ final class PermissionManager implements PluginRegistry.ActivityResultListener, 
             this.successCallback.onSuccess(requestResults);
         }
         return true;
+    }
+
+    /** Completes an interrupted request with the permissions already resolved. */
+    void cancelPendingRequest() {
+        if (pendingRequestCount == 0 || requestResults == null) {
+            return;
+        }
+
+        final Map<Integer, Integer> results = requestResults;
+        final RequestPermissionsSuccessCallback callback = successCallback;
+        pendingRequestCount = 0;
+        requestResults = null;
+        successCallback = null;
+        if (callback != null) {
+            callback.onSuccess(results);
+        }
     }
 
     /**

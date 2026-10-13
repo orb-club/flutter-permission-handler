@@ -59,14 +59,17 @@ public final class PermissionHandlerPlugin implements FlutterPlugin, ActivityAwa
 
     @Override
     public void onDetachedFromActivity() {
-        stopListeningToActivity();
-        deregisterListeners();
-        pluginBinding = null;
+        onDetachedFromActivityForConfigChanges();
+        if (permissionManager != null) {
+            permissionManager.cancelPendingRequest();
+        }
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        onDetachedFromActivity();
+        stopListeningToActivity();
+        deregisterListeners();
+        pluginBinding = null;
     }
 
 

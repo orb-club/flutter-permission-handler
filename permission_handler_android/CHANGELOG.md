@@ -1,4 +1,9 @@
 
+## Unreleased
+
+* Complete interrupted runtime permission requests with their partial results, so Dart callers can retry.
+* Preserve pending requests across configuration changes and unrelated plugin callbacks; complete them on permanent Activity detachment.
+
 ## 13.0.1
 
 * fix: Resolve `PermissionRequestInProgressException` when app is relaunched with non-standard launchMode.
